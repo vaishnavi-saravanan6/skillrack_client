@@ -13,7 +13,7 @@ const MyProfile = () => {
   // Fetch enrolled courses
   const getEnrolledCourses = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/course/enrolled", {
+      const res = await axios.get("https://skillcraftserver.onrender.com/course/enrolled", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setEnrolledCourses(res.data);
@@ -25,7 +25,7 @@ const MyProfile = () => {
   // Fetch completed todos (optional for streak tracking)
   const getCompletedTodos = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/todo/gettodo", {
+      const res = await axios.get("https://skillcraftserver.onrender.com/todo/gettodo", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const completed = res.data.filter(todo => todo.completed); // assuming `completed` field

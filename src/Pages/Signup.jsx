@@ -16,7 +16,7 @@ const Signup = () => {
     setSuccess("");
 
     try {
-      const { data } = await axios.post("http://localhost:5000/skillcraft/signup", {
+      const { data } = await axios.post("https://skillcraftserver.onrender.com/skillcraft/signup", {
         name,
         email,
         password,

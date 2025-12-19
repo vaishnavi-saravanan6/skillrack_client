@@ -9,7 +9,7 @@ const Courses = () => {
 
   const getCourses = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/course/all", {
+      const res = await axios.get("https://skillcraftserver.onrender.com/course/all", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCourses(res.data);

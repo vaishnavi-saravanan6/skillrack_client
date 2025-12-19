@@ -14,7 +14,7 @@ const Login = () => {
 
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/skillcraft/login", // full URL!
+        "https://skillcraftserver.onrender.com/skillcraft/login", // full URL!
         { email, password }
       );
 

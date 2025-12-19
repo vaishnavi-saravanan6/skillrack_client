@@ -30,7 +30,7 @@ const CreateCourse = () => {
         return;
       }
 
-      await axios.post("http://localhost:5000/course/create", form, {
+      await axios.post("https://skillcraftserver.onrender.com/course/create", form, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

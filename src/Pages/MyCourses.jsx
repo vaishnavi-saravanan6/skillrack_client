@@ -8,7 +8,7 @@ const MyCourses = () => {
   useEffect(() => {
     const fetchMyCourses = async () => {
       const res = await axios.get(
-        `http://localhost:5000/course/my/${userId}`
+        `https://skillcraftserver.onrender.com/course/my/${userId}`
       );
       setCourses(res.data);
     };
