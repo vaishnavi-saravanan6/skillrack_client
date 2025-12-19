@@ -39,3 +39,20 @@
     cursor: pointer;
     
 }
+.d {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #ef4444;
+}
+
+.d:hover {
+  color: #b91c1c;
+}
+
+.c {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}

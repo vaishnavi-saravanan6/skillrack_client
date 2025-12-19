@@ -1,59 +1,90 @@
-import React from "react";
-import { LinearProgress } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import StreakCard from "../Components/StreakCard";
 
-const courses = [
-  { title: "HTML Basics", completed: 1, total: 6 },
-  { title: "Finance 101", completed: 1, total: 6 },
-];
-
-const recommended = [
-  { title: "React Basics", completed: 2, total: 8 },
-  { title: "Time Management", completed: 9, total: 9 },
-];
 
 const MyProfile = () => {
-  // Calculate overall progress
-  const totalModules = [...courses, ...recommended].reduce((acc, c) => acc + c.total, 0);
-  const completedModules = [...courses, ...recommended].reduce((acc, c) => acc + c.completed, 0);
-  const progressPercent = Math.round((completedModules / totalModules) * 100);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const token = user?.token;
+
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [completedTodos, setCompletedTodos] = useState([]);
+
+  // Fetch enrolled courses
+  const getEnrolledCourses = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/course/enrolled", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setEnrolledCourses(res.data);
+    } catch (err) {
+      console.error("Error fetching enrolled courses:", err);
+    }
+  };
+
+  // Fetch completed todos (optional for streak tracking)
+  const getCompletedTodos = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/todo/gettodo", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const completed = res.data.filter(todo => todo.completed); // assuming `completed` field
+      setCompletedTodos(completed);
+    } catch (err) {
+      console.error("Error fetching todos:", err);
+    }
+  };
+
+  useEffect(() => {
+    getEnrolledCourses();
+    getCompletedTodos();
+  }, []);
+
+  // Simple streak logic: number of consecutive days with at least 1 completed todo
+  const calculateStreak = () => {
+    if (completedTodos.length === 0) return 0;
+
+    const dates = completedTodos.map(todo =>
+      new Date(todo.completedAt).toDateString()
+    );
+
+    dates.sort((a, b) => new Date(b) - new Date(a));
+
+    let streak = 1;
+    for (let i = 1; i < dates.length; i++) {
+      const prev = new Date(dates[i - 1]);
+      const curr = new Date(dates[i]);
+      const diff = (prev - curr) / (1000 * 60 * 60 * 24);
+      if (diff === 1) streak++;
+      else break;
+    }
+    return streak;
+  };
 
   return (
-    <div className="pt-24 px-10 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Welcome, Vaishu!</h1>
+    <div className="min-h-screen p-6 bg-gray-100">
+      <h1 className="text-3xl font-bold text-violet-600 mb-6">My Profile</h1>
 
-      {/* Progress Bar */}
-      <div className="mb-10">
-        <div className="flex justify-between mb-1">
-          <span className="font-medium text-gray-700">{progressPercent}% Complete</span>
-        </div>
-        <LinearProgress 
-          variant="determinate" 
-          value={progressPercent} 
-          sx={{ height: 10, borderRadius: 5, backgroundColor: "#e0e0e0", "& .MuiLinearProgress-bar": { backgroundColor: "#3b82f6" } }}
-        />
+      <div className="bg-white p-6 rounded-xl shadow mb-6">
+        <h2 className="text-xl font-semibold">User Info</h2>
+        <p>Name: {user.name}</p>
+        <p>Email: {user.email}</p>
       </div>
 
-      {/* Continue Learning */}
-      <h2 className="text-2xl font-semibold mb-4">Continue Learning</h2>
-      <div className="grid grid-cols-2 gap-4 mb-10">
-        {courses.map((course, idx) => (
-          <div key={idx} className="p-4 border rounded-lg shadow-sm flex flex-col justify-center items-start gap-2 hover:shadow-md transition">
-            <span className="font-medium text-gray-900">{course.title}</span>
-            <span className="text-gray-500 text-sm">{course.completed}/{course.total} modules</span>
-          </div>
-        ))}
+      <div className="bg-white p-6 rounded-xl shadow mb-6">
+        <h2 className="text-xl font-semibold">My Enrolled Courses</h2>
+        <p className="text-gray-600 mb-2">
+          You are enrolled in {enrolledCourses.length} course
+          {enrolledCourses.length !== 1 ? "s" : ""}.
+        </p>
+        <ul className="list-disc list-inside">
+          {enrolledCourses.map(course => (
+            <li key={course._id}>{course.title}</li>
+          ))}
+        </ul>
       </div>
 
-      {/* Recommended */}
-      <h2 className="text-2xl font-semibold mb-4">Recommended</h2>
-      <div className="grid grid-cols-2 gap-4">
-        {recommended.map((course, idx) => (
-          <div key={idx} className="p-4 border rounded-lg shadow-sm flex flex-col justify-center items-start gap-2 hover:shadow-md transition">
-            <span className="font-medium text-gray-900">{course.title}</span>
-            <span className="text-gray-500 text-sm">{course.completed}/{course.total} modules</span>
-          </div>
-        ))}
-      </div>
+      <StreakCard streak={calculateStreak()} />
     </div>
   );
 };
